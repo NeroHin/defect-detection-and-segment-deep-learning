@@ -3,19 +3,34 @@ from tqdm import tqdm
 from PIL import Image
 import os
 import pandas as pd
+import shutil
+import pathlib
+import argparse
+
+argparser = argparse.ArgumentParser(description="Preprocessing for YOLOv7")
+argparser.add_argument("-r", "--rename", help="rename the image, label and mask files", action="store_true", default=False)
+argparser.add_argument("-s", "--save", help="save the image, label and mask files", action="store_true", default=False)
+argparser.add_argument("-c", "--copy", help="copy the image, label and mask files", action="store_true", default=False)
+
+args = argparser.parse_args()
+args.rename = False
+args.save = False
+args.copy = False
 
 yolo_train_image_path = "../defect-detection-and-segment-deep-learning/yolov7/defect/images/train/"
 yolo_val_image_path = "../defect-detection-and-segment-deep-learning/yolov7/defect/images/val/"
 yolo_image_path = "../defect-detection-and-segment-deep-learning/yolov7/defect/"
+
+pathlib.Path(yolo_train_image_path).mkdir(parents=True, exist_ok=True)
+pathlib.Path(yolo_val_image_path).mkdir(parents=True, exist_ok=True)
 
 train_set_dir = '../defect-detection-and-segment-deep-learning/class_data/Train'
 test_set_dir = '../defect-detection-and-segment-deep-learning/class_data/Val'
 
 class_names = ['powder_uncover', 'powder_uneven', 'scratch']
 types = ['image']
-yolo_csv = pd.DataFrame(columns=["category", "x", "y", "w", "h", "image_name", "image_path"])
+yolo_csv = pd.DataFrame(columns=["category", "x", "y", "w", "h", "image_name", "set_type" ,"image_path"])
 
-rename = False
 
 # convert the label to yolo format
 def yolo_format(convert_img_file:str, save_img_file_name:str, save:bool=False):
@@ -37,27 +52,31 @@ def yolo_format(convert_img_file:str, save_img_file_name:str, save:bool=False):
             category_id = 2
         points = annotation["points"]
         
-        # normalize the bounding box
+        # point[0] is left top of the bounding box
+        # point[1] is right bottom of the bounding box
+        
         x_min, y_min = points[0]
         x_max, y_max = points[1]
+        
+        
+        # convert the bounding box to yolo format
         x = (x_min + (x_max-x_min)/2) * 1.0 / width
         y = (y_min + (y_max-y_min)/2) * 1.0 / height
         w = (x_max-x_min) * 1.0 / width
-        h = (y_max-y_min) * 1.0 / height
-        # print(category_id, x, y, w, h)
+        h = abs((y_max-y_min) * 1.0 / height)
+  
         
         yolo_format_data = str(category_id) + " " + str(x) + " " + str(y) + " " + str(w) + " " + str(h)
         
-        yolo_csv.loc[len(yolo_csv)] = [category_id, x, y, w, h, image_name, convert_img_file]
+        yolo_csv.loc[len(yolo_csv)] = [category_id, x, y, w, h, image_name, save_img_file_name ,convert_img_file]
         
         # save the bounding box and category_id to a text file
         # name is the same as the image name
         
         
-        
         if save == True:
         
-            with open(yolo_train_image_path.replace("image", "labels") + image_name.replace(".png", ".txt"), "a") as file:
+            with open(yolo_train_image_path.replace("images", "labels").replace("train", save_img_file_name) + image_name.replace(".png", ".txt"), "a") as file:
                 file.write(yolo_format_data)
                 file.write("\n")
                 
@@ -108,7 +127,15 @@ if __name__ == "__main__":
                 for filename in tqdm(os.listdir(type_dir)):
 
                     if dataset == train_set_dir:
-                        yolo_format(convert_img_file=f"{type_dir}/{filename}", save_img_file_name='train')
+                        yolo_format(convert_img_file=f"{type_dir}/{filename}", save_img_file_name='train',save=save)
                     else:
-                        yolo_format(convert_img_file=f"{type_dir}/{filename}", save_img_file_name='val')
+                        yolo_format(convert_img_file=f"{type_dir}/{filename}", save_img_file_name='val', save=save)
+                        
+    if copy == True:
+        for dataset in ["train", "val"]:
+            for image_paths in yolo_csv.query(f"set_type == '{dataset}'")["image_path"].unique():
+                # print(image_paths)
+                shutil.copy(image_paths, yolo_image_path + f"images/{dataset}/")
+            print(f"copy {dataset} images done")
+    
     
