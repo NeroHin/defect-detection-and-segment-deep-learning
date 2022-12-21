@@ -1,6 +1,4 @@
 # yolov7 ignore
-/defect-detection-and-segment-deep-learning/.gitignore
-
 
 # dataset
 /class_data

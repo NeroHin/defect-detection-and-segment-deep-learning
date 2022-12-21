@@ -41,6 +41,7 @@ results*.csv
 coco/
 coco128/
 VOC/
+defect/
 
 coco2017labels-segments.zip
 test2017.zip
