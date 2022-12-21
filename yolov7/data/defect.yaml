@@ -1,6 +1,6 @@
 # train and val data as 1) directory: path/images/, 2) file: path/images.txt, or 3) list: [path1/images/, path2/images/]
-train: ./defect/train.txt  
-val: ./defect/test.txt 
+train: ./defect/images/train
+val: ./defect/images/val
 
 
 # number of classes
