@@ -67,6 +67,8 @@ def yolo_format(convert_img_file: str, save_img_file_name: str, save: bool = Fal
         x = (x_min + (x_max-x_min)/2) * 1.0 / width
         y = (y_min + (y_max-y_min)/2) * 1.0 / height
         w = (x_max-x_min) * 1.0 / width
+
+        # the height have nagative value, so we need to use abs() to get the positive value
         h = abs((y_max-y_min) * 1.0 / height)
 
         yolo_format_data = str(category_id) + " " + str(x) + \
@@ -91,8 +93,6 @@ def yolo_format(convert_img_file: str, save_img_file_name: str, save: bool = Fal
             file.write("\n")
 
 # rename the image, label and mask files
-
-
 def rename_files(dataset_dir: str):
 
     for dataset in [dataset_dir]:
@@ -102,20 +102,22 @@ def rename_files(dataset_dir: str):
             for type_name in types:
                 type_dir = os.path.join(class_dir, type_name)
                 for filename in tqdm(os.listdir(type_dir)):
+
                     # rename the image name with class + image name
+                    # remove file name with space
 
                     if rename == True:
                         # rename the image name with class + image name
-                        os.rename(src=f"{type_dir}/{filename}",
-                                  dst=f"{type_dir}/{class_name}_{filename}")
+                        os.rename(
+                            src=f"{type_dir}/{filename}", dst=f"{type_dir}/{class_name}_{filename.replace(' ', '').lower()}")
 
                         # rename the label name with class + label name
                         os.rename(src=f"{type_dir.replace('image', 'label')}/{filename.replace('.png', '.json')}",
-                                  dst=f"{type_dir.replace('image', 'label')}/{class_name}_{filename.replace('.png', '.json')}")
+                                  dst=f"{type_dir.replace('image', 'label')}/{class_name}_{filename.replace('.png', '.json').replace(' ', '').lower()}")
 
                         # rename the mask name with class + mask name
                         os.rename(src=f"{type_dir.replace('image', 'mask')}/{filename}",
-                                  dst=f"{type_dir.replace('image', 'mask')}/{class_name}_{filename}")
+                                  dst=f"{type_dir.replace('image', 'mask')}/{class_name}_{filename.replace(' ', '').lower()}")
 
 
 if __name__ == "__main__":
