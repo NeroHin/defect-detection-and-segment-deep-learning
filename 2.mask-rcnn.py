@@ -48,9 +48,10 @@ class DefectDetectionDataset(torch.utils.data.Dataset):
                 for filename in os.listdir(type_dir):
                     if filename.endswith('.png'):
                         self.image_filenames.append(os.path.join(type_dir, filename))
+                        
                         # read the label file for bounding box position
                         self.bbox.append(os.path.join(type_dir.replace('image', 'label'), filename.replace('.png', '.json')))
-                        
+                            
 
                         self.mask_filenames.append(os.path.join(type_dir.replace('image', 'mask'), filename.replace('.png', '.png')))
                         self.labels.append(class_name)
@@ -60,6 +61,7 @@ class DefectDetectionDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx])
         mask = Image.open(self.mask_filenames[idx]).convert('L')
+        
         
     
         if self.transform:
