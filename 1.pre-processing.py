@@ -20,6 +20,7 @@ args.rename = False
 args.save = False
 args.copy = False
 
+#
 yolo_train_image_path = "../defect-detection-and-segment-deep-learning/yolov7/defect/images/train/"
 yolo_val_image_path = "../defect-detection-and-segment-deep-learning/yolov7/defect/images/val/"
 yolo_image_path = "../defect-detection-and-segment-deep-learning/yolov7/defect/"
@@ -39,15 +40,21 @@ yolo_csv = pd.DataFrame(
 # convert the label to yolo format
 def yolo_format(convert_img_file: str, save_img_file_name: str, save: bool = False):
 
+    # get label path
     label_path = convert_img_file.replace(
         "image", "label").replace(".png", ".json")
+
+    # get image name
     image_name = convert_img_file.split("/")[-1]
 
+    # read the label file
     with open(label_path, "r") as file:
         json_file = json.load(file)
 
+    # get the image size
     width, height = Image.open(convert_img_file).size
 
+    # process the label file
     for annotation in json_file["shapes"]:
         if annotation["label"] == "powder_uncover":
             category_id = 0
@@ -93,6 +100,8 @@ def yolo_format(convert_img_file: str, save_img_file_name: str, save: bool = Fal
             file.write("\n")
 
 # rename the image, label and mask files
+
+
 def rename_files(dataset_dir: str):
 
     for dataset in [dataset_dir]:
