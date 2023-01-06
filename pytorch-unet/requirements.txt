@@ -1,0 +1,5 @@
+numpy==1.23.5
+Pillow==9.3.0
+tqdm==4.64.1
+wandb==0.13.5
+pytorch==1.12.0

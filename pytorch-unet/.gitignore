@@ -1,0 +1,17 @@
+*.pyc
+masks/
+imgs/
+backup/
+masks_copy/
+imgs_copy/
+masks copy 2/
+imgs copy 2/
+data/
+__pycache__/
+checkpoints/
+*.pth
+*.jpg
+venv/
+.idea/
+wandb/
+output/
