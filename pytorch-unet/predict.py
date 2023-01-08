@@ -11,6 +11,7 @@ from torchvision import transforms
 from utils.data_loading import BasicDataset
 from unet import UNet
 from utils.utils import plot_img_and_mask
+from time import time
 
 def predict_img(net,
                 full_img,
@@ -82,6 +83,7 @@ if __name__ == '__main__':
     in_files = args.input
     out_files = get_output_filenames(args)
 
+
     net = UNet(n_channels=1, n_classes=2, bilinear=args.bilinear)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -100,12 +102,15 @@ if __name__ == '__main__':
         img = Image.open(filename)
         img = img.convert('L')
 
+        start = time()
         mask = predict_img(net=net,
                            full_img=img,
                            scale_factor=args.scale,
                            out_threshold=args.mask_threshold,
                            device=device)
-
+        end = time()
+        inference_time = f"{end - start}s"
+        print(inference_time)
         if not args.no_save:
             out_filename = out_files[i]
             result = mask_to_image(mask, mask_values)
