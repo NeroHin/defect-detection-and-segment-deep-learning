@@ -176,7 +176,7 @@ def get_args():
                         help='Percent of the data that is used as validation (0-100)')
     parser.add_argument('--amp', action='store_true', default=False, help='Use mixed precision')
     parser.add_argument('--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
-    parser.add_argument('--classes', '-c', type=int, default=3, help='Number of classes')
+    parser.add_argument('--classes', '-c', type=int, default=2, help='Number of classes')
 
     return parser.parse_args()
 
