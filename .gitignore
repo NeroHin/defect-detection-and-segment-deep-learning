@@ -4,7 +4,7 @@
 /class_data
 /class_data (副本)
 class_data.zip
-
+/test
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
